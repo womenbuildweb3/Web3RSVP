@@ -23,11 +23,7 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
 
 
     constructor() ERC721("Web3RSVP", "W3RSVP") {
-        address payable owner;
-        // payable?
-
-       // using Strings for uint256; ?
-        
+        owner = payable(msg.sender);
     }
 
     struct Event {
@@ -84,12 +80,18 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         // look up event
         Event myEvent = idToEvent[eventId]
 
-        // check if they have that much in their wallet
+        // check if they have that much in their wallet ????
 
         // transfer deposit to our contract 
-        myEvent.deposit
-        // transfer ticket cost to event creator
-        myEvent.costPerAttendee ==> myEvent.
+        // myEvent.deposit
+        // owner
+        // msg.sender
+
+        // use mint functions below
+
+        // transfer ticket cost to event owner
+        // myEvent.costPerAttendee ==> myEvent.eventOwner
+
         emit newRSVP(eventId, msg.sender);
     }
 
@@ -100,14 +102,6 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
     function setBaseURI(string memory URI) external onlyOwner {
         baseURI = URI;
     }    
-
-    //function pause() public onlyOwner {
-    //    _pause();
-   // }
-
-   // function unpause() public onlyOwner {
-   //     _unpause();
-  //  }
 
     function mint(uint8 _numTokens)
         external
