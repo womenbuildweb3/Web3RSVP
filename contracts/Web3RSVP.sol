@@ -130,6 +130,9 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         // make sure you require that msg.sender is the owner of the event
         require(msg.sender == myEvent.eventOwner);
 
+        // require that attendee is in myEvent.confirmedRSVPs
+        // ?
+
         // require that attendee is NOT in the claimedRSVPs list
         // is there an array.contains() method?
         for (uint8 i = 0; i < myEvent.claimedRSVPs.length; i++) {
