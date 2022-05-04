@@ -11,13 +11,10 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 //
 
 contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _eventIds;
-
     address payable owner;
 
 
-    event newEventCreated(uint256 eventID, address creatorAddress, uint timestampCreated, timestampForEvent, uint256 maxCapacity, uint256 costPerAttendee, uint256 deposit);
+    event newEventCreated(uint256 eventID, address creatorAddress, uint eventTimestamp, uint256 maxCapacity, uint256 deposit);
 
     event newRSVP(uint256 eventID, address attendeeAddress, uint256 rsvpID);
 
@@ -32,16 +29,11 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
     }
 
     struct CreateEvent {
-        uint256 eventId,
-        address eventOwner,
-        uint256 eventTimestamp,
-        uint256 public deposit;
-        string public eventName;
-        uint256 public maxCapacity;
-        //bool public _isSaleActive;
-        //uint256 public maxPerWallet; //
-        //uint256 public rsvpID;
-        //uint256 unclaimedDeposits;
+        uint256 eventId;
+        address eventOwner;
+        uint256 eventTimestamp;
+        uint256 deposit;
+        uint256 maxCapacity;
         address[] confirmedRSVPs;
         address[] claimedRSVPs;
         bool paidOut;
@@ -52,47 +44,24 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
     mapping(uint256 => CreateEvent ) public idToEvent;
 
     function createNewEvent(
-        uint256 eventId, //maybe pull this 
         uint256 eventTimestamp,
         uint256 deposit,
-        string eventName,
-        uint256 maxCapacity;
+        uint256 maxCapacity
     ) {
-        // instead of even letting them put in an id , let's generate it
+        // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(abi.encodePacked(msg.sender, address(this), eventTimestamp, costPerAttendee, eventName));
-        // make sure to require the idToEvent[eventId] is empty so you can't overwrite 
 
+        //what does this chunk do exactly?
+        //this creates a new CreateEvent struct and adds it to t
+       idToEvent[eventId] = CreateEvent(eventId, msg.sender, eventTimestamp, deposit, maxCapacity, [], [], false);
 
-
-       idToEvent[eventId] =  CreateEvent(
-        eventId,
-        msg.sender,
-        eventTimestamp,
-        costPerAttendee,
-        deposit,
-        eventName,
-        maxCapacity,
-        false,
-      );
-
-      emit newEventCreated(
-          eventId, 
-          // ?
-          msg.sender, 
-          // get time now?
-          now, 
-          //block.timestamp ??
-          eventTimestamp, 
-          maxCapacity, 
-          costPerAttendee, 
-          deposit
-          );
+      emit newEventCreated( eventId, msg.sender, eventTimestamp, maxCapacity, deposit);
     }
 
     function createNewRSVP(uint256 eventId) public payable {
         
         // look up event
-        Event myEvent = idToEvent[eventId]
+        Event myEvent = idToEvent[eventId];
 
         //require that they sent in enough ETH
         require(msg.value == myEvent.deposit, "NOT ENOUGH");
@@ -100,20 +69,14 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         //require that the event hasn't already happened (<eventTimestamp)
         require(block.timestamp <= myEvent.eventTimestamp, "ALREADY HAPPENED");
 
-        //increment the rspvID
         //you'll need to keep track of how many folks have RSVPED 
         //make sure event is under max capacity
         require(myEvent.confirmedRSVPs.length < myEvent.maxCapacity, "This event has reached capacity"); 
 
-        //check that they haven't already confirmed 
         //require that msg.sender isn't already in myEvent.confirmedRSVPs
 
         myEvent.confirmedRSVPs.push[msg.sender]; //add user to list of rspvs
 
-        //eventaully allowList people? be thinking about sybil resistance -- probably not 
-
-        //make sure to increment that count of rsvps
-        //myEvent.rsvplist.push(msg.sender)
 
         // transfer deposit to our contract 
         // myEvent.deposit
@@ -155,7 +118,7 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         // require that attendee is NOT in the claimedRSVPs list
 
         // add them to the claimedRSVPs list
-        myEvent.claimedRSVPs.push(attendee)
+        myEvent.claimedRSVPs.push(attendee);
 
         emit newRSVP(eventId, msg.sender);
     }
