@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 
@@ -15,27 +16,40 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
 
     address payable owner;
 
-    event newEventCreated(eventID, creatorAddress, timestampCreated, timestampForEvent, maxCapacity, costPerAttendee, deposit);
-
-    event newRSVP(eventID, attendeeAddress);
-
-    event confirmedAttendee(eventID, attendeeAddress);
-
-
     constructor() ERC721("Web3RSVP", "W3RSVP") {
         owner = payable(msg.sender);
     }
 
+        event newEventCreated(
+            uint256 eventID, 
+            address creatorAddress, 
+            uint256 timestampCreated, 
+            uint256 timestampForEvent, 
+            uint256 maxCapacity, 
+           uint256  costPerAttendee, 
+            uint256 deposit);
+
+    event newRSVP(
+        uint256 eventID,
+        address attendeeAddress
+        );
+
+    event confirmedAttendee(
+        uint256 eventID,
+        address attendeeAddress
+        );
+
     struct Event {
-        uint256 eventId,
-        address eventOwner,
-        uint256 eventTimestamp,
-        uint256 public costPerAttendee;
-        uint256 public deposit;
-        string public eventName;
-        uint256 public maxCapacity;
-        bool public _isSaleActive;
-        uint256 public maxPerWallet;
+        uint256 eventId;
+        address eventOwner;
+        uint256 eventTimestamp;
+        uint256 costPerAttendee;
+        uint256 deposit;
+        string eventName;
+        uint256 maxCapacity;
+        bool _isSaleActive;
+        uint256 maxPerWallet;
+        uint256 unclaimedDeposits;
     }
 
     // private ?
@@ -47,27 +61,27 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         uint256 costPerAttendee,
         uint256 deposit,
         string eventName,
-        uint256 maxCapacity;
-        uint256 public maxPerWallet
-    ) {
+        uint256 maxCapacity,
+        uint256 maxPerWallet
+    ) public {
         idToEvent[eventId] =  Event(
-        eventId,
-        msg.sender,
-        eventTimestamp,
-        costPerAttendee,
-        deposit,
-        eventName,
-        maxCapacity,
-        false,
-        maxPerWallet
-      );
+            eventId,
+            msg.sender,
+            eventTimestamp,
+            costPerAttendee,
+            deposit,
+            eventName,
+            maxCapacity,
+            false,
+            maxPerWallet
+        );
 
       emit newEventCreated(
           eventId, 
           // ?
           msg.sender, 
           // get time now?
-          now, 
+          //type now, 
           //block.timestamp ??
           eventTimestamp, 
           maxCapacity, 
@@ -76,16 +90,16 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
           );
     }
 
-    function newRSVP(eventId) {
+    function createNewRSVP(uint256 eventId) public payable {
         // look up event
-        Event myEvent = idToEvent[eventId]
-
-        // check if they have that much in their wallet ????
+        Event myEvent = idToEvent[eventId];
 
         // transfer deposit to our contract 
         // myEvent.deposit
         // owner
         // msg.sender
+
+        // increment unclaimedDeposits
 
         // use mint functions below
 
@@ -94,6 +108,33 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
 
         emit newRSVP(eventId, msg.sender);
     }
+
+    function confirmAttendee(uint256 eventId, address attendee) public {
+        // look up event
+        Event myEvent = idToEvent[eventId];
+
+        // transfer deposit from our contract back to attendee
+        // myEvent.deposit
+        // attendee
+
+        //decrement unclaimedDepsits
+
+        emit newRSVP(eventId, msg.sender);
+    }
+
+    function withdrawUnclaimedDeposits(uint256 eventId) public {
+        // look up event
+        Event myEvent = idToEvent[eventId];
+
+        // check if it's been 7 days past myEvent.eventTimestamp
+
+        // if yes, allow event owner to withdraw unclaimed deposits
+        // require msg.sender === myEvent.eventOwner
+
+        // transfer all unclaimed deposits
+
+    }
+
 
     function setSaleState(bool newState) public onlyOwner {
         _isSaleActive = newState;
