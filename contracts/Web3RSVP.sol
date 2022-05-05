@@ -6,7 +6,7 @@ pragma solidity ^0.8.4;
 contract rsvp {
     address payable owner;
 
-    event newEventCreated(
+    event NewEventCreated(
         bytes32 eventID,
         address creatorAddress,
         uint256 eventTimestamp,
@@ -14,9 +14,9 @@ contract rsvp {
         uint256 deposit
     );
 
-    event newRSVP(bytes32 eventID, address attendeeAddress);
+    event NewRSVP(bytes32 eventID, address attendeeAddress);
 
-    event confirmedAttendee(bytes32 eventID, address attendeeAddress);
+    event ConfirmedAttendee(bytes32 eventID, address attendeeAddress);
 
     struct CreateEvent {
         bytes32 eventId;
@@ -63,7 +63,7 @@ contract rsvp {
             false
         );
 
-        emit newEventCreated(
+        emit NewEventCreated(
             eventId,
             msg.sender,
             eventTimestamp,
@@ -74,7 +74,7 @@ contract rsvp {
 
     function createNewRSVP(bytes32 eventId) public payable {
         // look up event
-        CreateEvent memory myEvent = idToEvent[eventId];
+        CreateEvent storage myEvent = idToEvent[eventId];
 
         // transfer deposit to our contract / require that they sent in enough ETH
         require(msg.value == myEvent.deposit, "NOT ENOUGH");
@@ -89,17 +89,13 @@ contract rsvp {
         );
 
         //require that msg.sender isn't already in myEvent.confirmedRSVPs
-        // is there an array.contains() method?
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
             require(myEvent.confirmedRSVPs[i] != msg.sender);
         }
 
-        //we'll need to keep track of how many folks have RSVPED
-        // this won't work ? because myEvent is stored in memory ?
-        myEvent.confirmedRSVPs.push[msg.sender]; //add user to list of rspvs
+        myEvent.confirmedRSVPs.push(payable(msg.sender)); 
         
-
-        emit newRSVP(eventId, msg.sender);
+        emit NewRSVP(eventId, msg.sender);
     }
 
     function confirmGroup(bytes32 eventId, address[] calldata attendees) public {
@@ -117,7 +113,7 @@ contract rsvp {
 
     function confirmAttendee(bytes32 eventId, address attendee) public {
         // look up event
-        CreateEvent memory myEvent = idToEvent[eventId];
+        CreateEvent storage myEvent = idToEvent[eventId];
 
         // make sure you require that msg.sender is the owner of the event
         require(msg.sender == myEvent.eventOwner);
@@ -133,13 +129,11 @@ contract rsvp {
         myEvent.claimedRSVPs.push(attendee);
 
         // sending eth back to the staker https://solidity-by-example.org/sending-ether
-        (bool sent, bytes memory data) = attendee.call{value: myEvent.deposit}(
-            ""
-        );
+        (bool sent, bytes memory data) = attendee.call{value: myEvent.deposit}("");
         require(sent, "Failed to send Ether");
         //what happens if this fails?
 
-        emit newRSVP(eventId, msg.sender);
+        emit NewRSVP(eventId, msg.sender);
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) public {
@@ -158,12 +152,8 @@ contract rsvp {
         // only the event owner can withdraw
         require(msg.sender == myEvent.eventOwner, "MUST BE EVENT OWNER");
 
-        // mark as paid
-        myEvent.paidOut = true;
-
         // calculate how many people didn't claim by comparing
-        uint256 unclaimed = myEvent.confirmedRSVPs.length -
-            myEvent.claimedRSVPs.length;
+        uint256 unclaimed = myEvent.confirmedRSVPs.length - myEvent.claimedRSVPs.length;
 
         uint256 payout = unclaimed * myEvent.deposit;
 
@@ -171,5 +161,8 @@ contract rsvp {
         (bool sent, ) = msg.sender.call{value: payout}("");
         require(sent, "Failed to send Ether");
         // what happens if this fails?
+
+        // mark as paid
+        myEvent.paidOut = true;
     }
 }
