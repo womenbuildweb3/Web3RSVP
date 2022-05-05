@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-
 // to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
 
-contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
+contract rsvp {
     address payable owner;
 
     event newEventCreated(
@@ -22,10 +17,6 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
     event newRSVP(bytes32 eventID, address attendeeAddress);
 
     event confirmedAttendee(bytes32 eventID, address attendeeAddress);
-
-    constructor() ERC721("Web3RSVP", "W3RSVP") {
-        owner = payable(msg.sender);
-    }
 
     struct CreateEvent {
         bytes32 eventId;
@@ -106,6 +97,7 @@ contract MyToken is ERC721, Pausable, Ownable, ERC721Burnable {
         //we'll need to keep track of how many folks have RSVPED
         // this won't work ? because myEvent is stored in memory ?
         myEvent.confirmedRSVPs.push[msg.sender]; //add user to list of rspvs
+        
 
         emit newRSVP(eventId, msg.sender);
     }
