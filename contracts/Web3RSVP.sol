@@ -120,12 +120,25 @@ contract rsvp {
 
         // require that attendee is in myEvent.confirmedRSVPs
         // ?
+        address rsvpConfirm;
+
+        for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
+            if(myEvent.confirmedRSVPs[i] == attendee){
+                rsvpConfirm = myEvent.confirmedRSVPs[i];
+            }
+        }
+
+        require(rsvpConfirm == attendee);
+
 
         // require that attendee is NOT in the claimedRSVPs list
         // is there an array.contains() method?
         for (uint8 i = 0; i < myEvent.claimedRSVPs.length; i++) {
             require(myEvent.claimedRSVPs[i] != msg.sender);
         }
+
+        // require that deposits are not already claimed
+        require(myEvent.paidOut == false);
 
         // add them to the claimedRSVPs list
         // this wont work ?
@@ -135,6 +148,7 @@ contract rsvp {
         (bool sent, bytes memory data) = attendee.call{value: myEvent.deposit}("");
         require(sent, "Failed to send Ether");
         //what happens if this fails?
+        // data variable is unused here
 
         emit NewRSVP(eventId, msg.sender);
     }
@@ -160,12 +174,12 @@ contract rsvp {
 
         uint256 payout = unclaimed * myEvent.deposit;
 
+        // mark as paid before sending to avoid reentrancy attack
+        myEvent.paidOut = true;
+
         // send the payout to the owner
         (bool sent, ) = msg.sender.call{value: payout}("");
         require(sent, "Failed to send Ether");
         // what happens if this fails?
-
-        // mark as paid
-        myEvent.paidOut = true;
     }
 }
