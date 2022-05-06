@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 // to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
 
-contract rsvp {
+contract Web3RSVP {
     address payable owner;
 
     event NewEventCreated(
@@ -17,6 +17,8 @@ contract rsvp {
     event NewRSVP(bytes32 eventID, address attendeeAddress);
 
     event ConfirmedAttendee(bytes32 eventID, address attendeeAddress);
+
+    event DepositsPaidOut(bytes32 eventID);
 
     struct CreateEvent {
         bytes32 eventId;
@@ -145,10 +147,12 @@ contract rsvp {
         myEvent.claimedRSVPs.push(attendee);
 
         // sending eth back to the staker https://solidity-by-example.org/sending-ether
-        (bool sent, bytes memory data) = attendee.call{value: myEvent.deposit}("");
-        require(sent, "Failed to send Ether");
+        (bool sent,) = attendee.call{value: myEvent.deposit}("");
+        // require(sent, "Failed to send Ether");
         //what happens if this fails?
-        // data variable is unused here
+        if(!sent){
+            // delete myEvent.claimedRSVPs[attendee];
+        }
 
         emit NewRSVP(eventId, msg.sender);
     }
@@ -179,7 +183,12 @@ contract rsvp {
 
         // send the payout to the owner
         (bool sent, ) = msg.sender.call{value: payout}("");
-        require(sent, "Failed to send Ether");
+        // require(sent, "Failed to send Ether");
         // what happens if this fails?
+        if(!sent){
+            myEvent.paidOut == false;
+        }
+
+        emit DepositsPaidOut(eventId);
     }
 }
