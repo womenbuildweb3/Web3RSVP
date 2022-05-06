@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+// import "hardhat/console.sol";
+
 // to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
 
 contract Web3RSVP {
