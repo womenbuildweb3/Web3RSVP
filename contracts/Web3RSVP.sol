@@ -38,7 +38,7 @@ contract Web3RSVP {
         uint256 eventTimestamp,
         uint256 deposit,
         uint256 maxCapacity
-    ) public {
+    ) external {
         // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(
             abi.encodePacked(
@@ -74,7 +74,7 @@ contract Web3RSVP {
         );
     }
 
-    function createNewRSVP(bytes32 eventId) public payable {
+    function createNewRSVP(bytes32 eventId) external payable {
         // look up event
         CreateEvent storage myEvent = idToEvent[eventId];
 
@@ -100,7 +100,7 @@ contract Web3RSVP {
         emit NewRSVP(eventId, msg.sender);
     }
 
-    function confirmGroup(bytes32 eventId, address[] calldata attendees) public {
+    function confirmGroup(bytes32 eventId, address[] calldata attendees) external {
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
@@ -157,7 +157,7 @@ contract Web3RSVP {
         emit NewRSVP(eventId, msg.sender);
     }
 
-    function withdrawUnclaimedDeposits(bytes32 eventId) public {
+    function withdrawUnclaimedDeposits(bytes32 eventId) external {
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
