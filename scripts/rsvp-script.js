@@ -14,12 +14,16 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Web3RSVP");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const RSVP = await hre.ethers.getContractFactory("Web3RSVP");
+  const [deployer] = await hre.ethers.getSigners();
+  const accountBalance = await deployer.getBalance();
+  const rsvp = await RSVP.deploy();
 
-  await greeter.deployed();
+  await rsvp.deployed();
 
-  console.log("Web3RSVP deployed to:", greeter.address);
+  console.log("Deploying contracts with account: ", deployer.address);
+  console.log("Web3RSVP deployed to:", rsvp.address);
+  console.log("Account balance: ", accountBalance.toString());
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -30,3 +34,4 @@ main()
     console.error(error);
     process.exit(1);
   });
+

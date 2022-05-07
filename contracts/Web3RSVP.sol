@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 // to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
 
-contract rsvp {
+contract Web3RSVP {
     address payable owner;
 
     event NewEventCreated(
