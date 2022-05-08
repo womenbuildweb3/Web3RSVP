@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// import "hardhat/console.sol";
-
-// to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
+import "hardhat/console.sol";
 
 contract Web3RSVP {
     address payable owner;
@@ -94,10 +92,12 @@ contract Web3RSVP {
 
         //require that msg.sender isn't already in myEvent.confirmedRSVPs
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
-            require(myEvent.confirmedRSVPs[i] != msg.sender);
+            require(myEvent.confirmedRSVPs[i] != msg.sender, "ALREADY CONFIRMED");
         }
 
         myEvent.confirmedRSVPs.push(payable(msg.sender)); 
+
+        console.log("NEW RSVP!! TOTAL RSVPS:", myEvent.confirmedRSVPs.length);
         
         emit NewRSVP(eventId, msg.sender);
     }
@@ -107,7 +107,7 @@ contract Web3RSVP {
         CreateEvent memory myEvent = idToEvent[eventId];
 
         // make sure you require that msg.sender is the owner of the event
-        require(msg.sender == myEvent.eventOwner);
+        require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
 
         //confirm each attendee
         for (uint8 i = 0; i < attendees.length; i++) {
@@ -120,7 +120,7 @@ contract Web3RSVP {
         CreateEvent storage myEvent = idToEvent[eventId];
 
         // make sure you require that msg.sender is the owner of the event
-        require(msg.sender == myEvent.eventOwner);
+        require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
 
         // require that attendee is in myEvent.confirmedRSVPs
         // ?
@@ -132,7 +132,7 @@ contract Web3RSVP {
             }
         }
 
-        require(rsvpConfirm == attendee);
+        require(rsvpConfirm == attendee, "NO RSVP TO CONFIRM");
 
 
         // require that attendee is NOT in the claimedRSVPs list
@@ -156,7 +156,9 @@ contract Web3RSVP {
             // delete myEvent.claimedRSVPs[attendee];
         }
 
-        emit NewRSVP(eventId, msg.sender);
+        console.log("ATTENDEE CONFIRMED!! TOTAL CONFIMRED:", myEvent.claimedRSVPs.length);
+
+        emit ConfirmedAttendee(eventId, msg.sender);
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {

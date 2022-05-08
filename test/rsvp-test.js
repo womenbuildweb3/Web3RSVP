@@ -18,7 +18,17 @@ describe("Create New Event", function () {
       {value: deposit}
      ))
      .to.emit(rsvpContract, "NewRSVP")
-     .withArgs('0xc93edc827ede8716c9cfeac7e6f8b9980572ebf76dd956f408537b302c4068cd', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266')
+     .withArgs('0xc93edc827ede8716c9cfeac7e6f8b9980572ebf76dd956f408537b302c4068cd', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
+
+     await expect(rsvpContract.confirmAttendee(
+      // this is the eventID created above
+      '0xc93edc827ede8716c9cfeac7e6f8b9980572ebf76dd956f408537b302c4068cd', 
+      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+     ))
+     .to.emit(rsvpContract, "ConfirmedAttendee")
+     .withArgs('0xc93edc827ede8716c9cfeac7e6f8b9980572ebf76dd956f408537b302c4068cd', '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
+
+
 
   });
 });
