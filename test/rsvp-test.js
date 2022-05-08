@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Create New Event", function () {
-  it("should create a new event and rsvp", async function () {
+  it("should create a new event, rsvp, and confirm", async function () {
     const RSVP = await ethers.getContractFactory("Web3RSVP");
     const rsvpContract = await RSVP.deploy();
     await rsvpContract.deployed();
