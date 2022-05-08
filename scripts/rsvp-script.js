@@ -21,11 +21,21 @@ const main = async () => {
   // console.log("Deploying contracts with account: ", deployer.address);
   // console.log("Web3RSVP deployed to:", rsvp.address);
   // console.log("Account balance: ", accountBalance.toString());
+
+  let deposit = hre.ethers.utils.parseEther("1")
+  let maxCapacity = 3
+  let timestamp = 1652402280
  
-  let txn = await rsvpContract.createNewEvent(1652402280, 1, 25)
-  await txn.wait()
-  console.log("TRANSACTION:", txn)
-  console.log("created new event")
+  let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity)
+  let wait = await txn.wait()
+  console.log("NEW EVENT CREATED:", wait.events[0].event, wait.events[0].args)
+
+  let eventID = wait.events[0].args.eventID
+  console.log("EVENT ID:", eventID)
+
+  txn = await rsvpContract.createNewRSVP(eventID, {value: deposit})
+  wait = await txn.wait()
+  console.log("NEW RSVP:", wait.events[0].event, wait.events[0].args)
   
 };
 
