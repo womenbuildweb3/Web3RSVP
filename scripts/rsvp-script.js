@@ -10,7 +10,7 @@ const main = async () => {
   const rsvpContract = await rsvpContractFactory.deploy();
   await rsvpContract.deployed();
   console.log("Contract deployed to:", rsvpContract.address);
-
+  
   // const RSVP = await hre.ethers.getContractFactory("Web3RSVP");
   // const [deployer] = await hre.ethers.getSigners();
   // const accountBalance = await deployer.getBalance();
@@ -26,7 +26,7 @@ const main = async () => {
   await txn.wait()
   console.log("TRANSACTION:", txn)
   console.log("created new event")
-
+  
 };
 
 const runMain = async () => {
@@ -40,3 +40,4 @@ const runMain = async () => {
 };
 
 runMain();
+
