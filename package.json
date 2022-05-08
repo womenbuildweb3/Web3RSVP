@@ -1,7 +1,6 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "test-sample": "node scripts/sample-script.js",
     "script": "node scripts/rsvp-script.js"
   },
   "devDependencies": {
