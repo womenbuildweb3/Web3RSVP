@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-// to do: figure out how to push to confirmedRSVPs / claimedRSVPs 
+import "hardhat/console.sol";
 
 contract Web3RSVP {
     address payable owner;
@@ -17,6 +17,8 @@ contract Web3RSVP {
     event NewRSVP(bytes32 eventID, address attendeeAddress);
 
     event ConfirmedAttendee(bytes32 eventID, address attendeeAddress);
+
+    event DepositsPaidOut(bytes32 eventID);
 
     struct CreateEvent {
         bytes32 eventId;
@@ -36,7 +38,7 @@ contract Web3RSVP {
         uint256 eventTimestamp,
         uint256 deposit,
         uint256 maxCapacity
-    ) public {
+    ) external {
         // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(
             abi.encodePacked(
@@ -72,7 +74,7 @@ contract Web3RSVP {
         );
     }
 
-    function createNewRSVP(bytes32 eventId) public payable {
+    function createNewRSVP(bytes32 eventId) external payable {
         // look up event
         CreateEvent storage myEvent = idToEvent[eventId];
 
@@ -90,20 +92,22 @@ contract Web3RSVP {
 
         //require that msg.sender isn't already in myEvent.confirmedRSVPs
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
-            require(myEvent.confirmedRSVPs[i] != msg.sender);
+            require(myEvent.confirmedRSVPs[i] != msg.sender, "ALREADY CONFIRMED");
         }
 
         myEvent.confirmedRSVPs.push(payable(msg.sender)); 
+
+        console.log("NEW RSVP!! TOTAL RSVPS:", myEvent.confirmedRSVPs.length);
         
         emit NewRSVP(eventId, msg.sender);
     }
 
-    function confirmGroup(bytes32 eventId, address[] calldata attendees) public {
+    function confirmGroup(bytes32 eventId, address[] calldata attendees) external {
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
         // make sure you require that msg.sender is the owner of the event
-        require(msg.sender == myEvent.eventOwner);
+        require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
 
         //confirm each attendee
         for (uint8 i = 0; i < attendees.length; i++) {
@@ -116,7 +120,20 @@ contract Web3RSVP {
         CreateEvent storage myEvent = idToEvent[eventId];
 
         // make sure you require that msg.sender is the owner of the event
-        require(msg.sender == myEvent.eventOwner);
+        require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
+
+        // require that attendee is in myEvent.confirmedRSVPs
+        // ?
+        address rsvpConfirm;
+
+        for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
+            if(myEvent.confirmedRSVPs[i] == attendee){
+                rsvpConfirm = myEvent.confirmedRSVPs[i];
+            }
+        }
+
+        require(rsvpConfirm == attendee, "NO RSVP TO CONFIRM");
+
 
         // require that attendee is NOT in the claimedRSVPs list
         // is there an array.contains() method?
@@ -124,19 +141,27 @@ contract Web3RSVP {
             require(myEvent.claimedRSVPs[i] != msg.sender);
         }
 
+        // require that deposits are not already claimed
+        require(myEvent.paidOut == false);
+
         // add them to the claimedRSVPs list
         // this wont work ?
         myEvent.claimedRSVPs.push(attendee);
 
         // sending eth back to the staker https://solidity-by-example.org/sending-ether
-        (bool sent, bytes memory data) = attendee.call{value: myEvent.deposit}("");
-        require(sent, "Failed to send Ether");
+        (bool sent,) = attendee.call{value: myEvent.deposit}("");
+        // require(sent, "Failed to send Ether");
         //what happens if this fails?
+        if(!sent){
+            // delete myEvent.claimedRSVPs[attendee];
+        }
 
-        emit NewRSVP(eventId, msg.sender);
+        console.log("ATTENDEE CONFIRMED!! TOTAL CONFIMRED:", myEvent.claimedRSVPs.length);
+
+        emit ConfirmedAttendee(eventId, msg.sender);
     }
 
-    function withdrawUnclaimedDeposits(bytes32 eventId) public {
+    function withdrawUnclaimedDeposits(bytes32 eventId) external {
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
@@ -157,12 +182,17 @@ contract Web3RSVP {
 
         uint256 payout = unclaimed * myEvent.deposit;
 
+        // mark as paid before sending to avoid reentrancy attack
+        myEvent.paidOut = true;
+
         // send the payout to the owner
         (bool sent, ) = msg.sender.call{value: payout}("");
-        require(sent, "Failed to send Ether");
+        // require(sent, "Failed to send Ether");
         // what happens if this fails?
+        if(!sent){
+            myEvent.paidOut == false;
+        }
 
-        // mark as paid
-        myEvent.paidOut = true;
+        emit DepositsPaidOut(eventId);
     }
 }
