@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 contract Web3RSVP {
-    address payable owner; // we're not using this variable, we don't need it right? @terps
 
     event NewEventCreated(
         bytes32 eventID,
