@@ -1,7 +1,7 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "script": "node scripts/rsvp-script.js"
+    "script": "node scripts/deploy.js"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.8",
@@ -13,7 +13,6 @@
     "hardhat": "^2.9.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.6.0",
     "hardhat-tracer": "^1.1.0-rc.3"
   }
 }

@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 contract Web3RSVP {
-    address payable owner; // we're not using this variable, we don't need it right? @terps
 
     event NewEventCreated(
         bytes32 eventID,
@@ -22,7 +21,7 @@ contract Web3RSVP {
 
     struct CreateEvent {
         bytes32 eventId;
-        string eventName; // I think we do need to store this on-chain - how else are we going to persist the event name to show it on the front end? @terps 
+        string eventName;
         address eventOwner;
         uint256 eventTimestamp;
         uint256 deposit;
@@ -32,14 +31,13 @@ contract Web3RSVP {
         bool paidOut;
     }
 
-    CreateEvent public createevent; // we're also not using this ? @terps
     mapping(bytes32 => CreateEvent) public idToEvent;
 
     function createNewEvent(
         uint256 eventTimestamp,
         uint256 deposit,
         uint256 maxCapacity,
-        string memory eventName
+        string calldata eventName
     ) external {
         // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(
@@ -127,7 +125,6 @@ contract Web3RSVP {
         require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
 
         // require that attendee is in myEvent.confirmedRSVPs
-        // ?
         address rsvpConfirm;
 
         for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
@@ -149,15 +146,14 @@ contract Web3RSVP {
         require(myEvent.paidOut == false);
 
         // add them to the claimedRSVPs list
-        // this wont work ?
         myEvent.claimedRSVPs.push(attendee);
 
         // sending eth back to the staker https://solidity-by-example.org/sending-ether
         (bool sent,) = attendee.call{value: myEvent.deposit}("");
-        // require(sent, "Failed to send Ether");
-        //what happens if this fails?
+        require(sent, "Failed to send Ether");
+        //if this fails
         if(!sent){
-            // delete myEvent.claimedRSVPs[attendee];
+            myEvent.claimedRSVPs.pop();
         }
 
         console.log("ATTENDEE CONFIRMED!! TOTAL CONFIMRED:", myEvent.claimedRSVPs.length);
@@ -166,6 +162,7 @@ contract Web3RSVP {
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {
+        console.log("GOING TO WITHDRAW");
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
@@ -191,11 +188,13 @@ contract Web3RSVP {
 
         // send the payout to the owner
         (bool sent, ) = msg.sender.call{value: payout}("");
-        // require(sent, "Failed to send Ether");
-        // what happens if this fails?
+        require(sent, "Failed to send Ether");
+        // if this fails
         if(!sent){
             myEvent.paidOut == false;
         }
+
+        console.log("PAID OUT!", myEvent.paidOut);
 
         emit DepositsPaidOut(eventId);
     }
