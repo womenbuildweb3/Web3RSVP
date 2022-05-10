@@ -12,7 +12,7 @@ describe("Create New Event", function () {
 
     await expect(rsvpContract.createNewEvent(1683769877, deposit, 25, "my party"))
     .to.emit(rsvpContract, "NewEventCreated")
-    .withArgs(eventID, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 1683769877, 25, '1000000000000000000');
+    .withArgs(eventID, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 1683769877, 25, '1000000000000000000', "my party");
 
     await expect(rsvpContract.createNewRSVP(
       // this is the eventID created above
