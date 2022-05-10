@@ -1,7 +1,7 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "script": "node scripts/rsvp-script.js"
+    "script": "node scripts/deploy.js"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.8",
