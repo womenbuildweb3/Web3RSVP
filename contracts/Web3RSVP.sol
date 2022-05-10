@@ -10,7 +10,8 @@ contract Web3RSVP {
         address creatorAddress,
         uint256 eventTimestamp,
         uint256 maxCapacity,
-        uint256 deposit
+        uint256 deposit,
+        string eventName
     );
 
     event NewRSVP(bytes32 eventID, address attendeeAddress);
@@ -72,7 +73,8 @@ contract Web3RSVP {
             msg.sender,
             eventTimestamp,
             maxCapacity,
-            deposit
+            deposit,
+            eventName
         );
     }
 
