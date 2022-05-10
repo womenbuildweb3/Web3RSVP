@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 contract Web3RSVP {
-    address payable owner;
+    address payable owner; // we're not using this variable, we don't need it right? @terps
 
     event NewEventCreated(
         bytes32 eventID,
@@ -22,6 +22,7 @@ contract Web3RSVP {
 
     struct CreateEvent {
         bytes32 eventId;
+        string eventName; // I think we do need to store this on-chain - how else are we going to persist the event name to show it on the front end? @terps 
         address eventOwner;
         uint256 eventTimestamp;
         uint256 deposit;
@@ -31,13 +32,14 @@ contract Web3RSVP {
         bool paidOut;
     }
 
-    CreateEvent public createevent;
+    CreateEvent public createevent; // we're also not using this ? @terps
     mapping(bytes32 => CreateEvent) public idToEvent;
 
     function createNewEvent(
         uint256 eventTimestamp,
         uint256 deposit,
-        uint256 maxCapacity
+        uint256 maxCapacity,
+        string memory eventName
     ) external {
         // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(
@@ -50,12 +52,14 @@ contract Web3RSVP {
             )
         );
 
-        address[] memory confirmedRSVPs;
+        address[] memory confirmedRSVPs; 
         address[] memory claimedRSVPs;
+        
 
         //this creates a new CreateEvent struct and adds it to the idToEvent mapping
         idToEvent[eventId] = CreateEvent(
             eventId,
+            eventName,
             msg.sender,
             eventTimestamp,
             deposit,
