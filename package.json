@@ -1,7 +1,9 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "script": "node scripts/deploy.js"
+    "deploy": "node scripts/deploy.js",
+    "script": "node scripts/run.js",
+    "test": "npx hardhat test --trace"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.8",
