@@ -1,7 +1,9 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "script": "node scripts/deploy.js"
+    "deploy": "npx hardhat run scripts/deploy.js --network goerli",
+    "script": "node scripts/run.js",
+    "test": "npx hardhat test --trace"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.8",
@@ -13,6 +15,7 @@
     "hardhat": "^2.9.3"
   },
   "dependencies": {
+    "dotenv": "^16.0.1",
     "hardhat-tracer": "^1.1.0-rc.3"
   }
 }
