@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
 contract Web3RSVP {
 
     event NewEventCreated(
@@ -101,8 +99,6 @@ contract Web3RSVP {
 
         myEvent.confirmedRSVPs.push(payable(msg.sender)); 
 
-        console.log("NEW RSVP!! TOTAL RSVPS:", myEvent.confirmedRSVPs.length);
-        
         emit NewRSVP(eventId, msg.sender);
     }
 
@@ -158,13 +154,10 @@ contract Web3RSVP {
             myEvent.claimedRSVPs.pop();
         }
 
-        console.log("ATTENDEE CONFIRMED!! TOTAL CONFIMRED:", myEvent.claimedRSVPs.length);
-
         emit ConfirmedAttendee(eventId, msg.sender);
     }
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {
-        console.log("GOING TO WITHDRAW");
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
@@ -195,8 +188,6 @@ contract Web3RSVP {
         if(!sent){
             myEvent.paidOut == false;
         }
-
-        console.log("PAID OUT!", myEvent.paidOut);
 
         emit DepositsPaidOut(eventId);
     }
