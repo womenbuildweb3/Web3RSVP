@@ -135,24 +135,25 @@ contract Web3RSVP {
 
 
         // require that attendee is NOT in the claimedRSVPs list
-        // is there an array.contains() method?
         for (uint8 i = 0; i < myEvent.claimedRSVPs.length; i++) {
-            require(myEvent.claimedRSVPs[i] != msg.sender);
+            require(myEvent.claimedRSVPs[i] != attendee, "ALREADY CLAIMED");
         }
 
         // require that deposits are not already claimed
-        require(myEvent.paidOut == false);
+        require(myEvent.paidOut == false, "ALREADY PAID OUT");
 
         // add them to the claimedRSVPs list
         myEvent.claimedRSVPs.push(attendee);
 
         // sending eth back to the staker https://solidity-by-example.org/sending-ether
         (bool sent,) = attendee.call{value: myEvent.deposit}("");
-        require(sent, "Failed to send Ether");
+     
         //if this fails
         if(!sent){
             myEvent.claimedRSVPs.pop();
         }
+
+        require(sent, "Failed to send Ether");
 
         emit ConfirmedAttendee(eventId, msg.sender);
     }
@@ -183,11 +184,13 @@ contract Web3RSVP {
 
         // send the payout to the owner
         (bool sent, ) = msg.sender.call{value: payout}("");
-        require(sent, "Failed to send Ether");
+        
         // if this fails
         if(!sent){
             myEvent.paidOut == false;
         }
+
+        require(sent, "Failed to send Ether");
 
         emit DepositsPaidOut(eventId);
     }
