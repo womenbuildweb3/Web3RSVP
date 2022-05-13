@@ -10,7 +10,7 @@ const main = async () => {
 
   let deposit = hre.ethers.utils.parseEther("1")
   let maxCapacity = 3
-  let timestamp = 1652402280
+  let timestamp = 1652517724
   let eventName = "My Party"
  
   let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventName)
@@ -32,7 +32,7 @@ const main = async () => {
   wait = await txn.wait()
   console.log("NEW RSVP:", wait.events[0].event, wait.events[0].args)
 
-  txn = await rsvpContract.confirmAttendee(eventID, address1.address)
+  txn = await rsvpContract.confirmAttendee(eventID, deployer.address)
   wait = await txn.wait()
 
   txn = await rsvpContract.confirmAttendee(eventID, address2.address)
