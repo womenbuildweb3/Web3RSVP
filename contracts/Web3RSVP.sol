@@ -9,7 +9,7 @@ contract Web3RSVP {
         uint256 eventTimestamp,
         uint256 maxCapacity,
         uint256 deposit,
-        string eventName
+        string eventDataCID
     );
 
     event NewRSVP(bytes32 eventID, address attendeeAddress);
@@ -20,7 +20,7 @@ contract Web3RSVP {
 
     struct CreateEvent {
         bytes32 eventId;
-        string eventName;
+        string eventDataCID;
         address eventOwner;
         uint256 eventTimestamp;
         uint256 deposit;
@@ -36,7 +36,7 @@ contract Web3RSVP {
         uint256 eventTimestamp,
         uint256 deposit,
         uint256 maxCapacity,
-        string calldata eventName
+        string calldata eventDataCID
     ) external {
         // generate an eventID based on other things passed in to generate a hash
         bytes32 eventId = keccak256(
@@ -56,7 +56,7 @@ contract Web3RSVP {
         //this creates a new CreateEvent struct and adds it to the idToEvent mapping
         idToEvent[eventId] = CreateEvent(
             eventId,
-            eventName,
+            eventDataCID,
             msg.sender,
             eventTimestamp,
             deposit,
@@ -72,7 +72,7 @@ contract Web3RSVP {
             eventTimestamp,
             maxCapacity,
             deposit,
-            eventName
+            eventDataCID
         );
     }
 

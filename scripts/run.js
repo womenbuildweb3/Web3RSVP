@@ -11,9 +11,9 @@ const main = async () => {
   let deposit = hre.ethers.utils.parseEther("1")
   let maxCapacity = 3
   let timestamp = 1652517724
-  let eventName = "My Party"
+  let eventDataCID = "bafybeihe2gh5zypdiacmz5zl7z3wuhohlepjwysjkbzar5wgaopr4nwqyi"
  
-  let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventName)
+  let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventDataCID)
   let wait = await txn.wait()
   console.log("NEW EVENT CREATED:", wait.events[0].event, wait.events[0].args)
 
