@@ -1,7 +1,7 @@
 {
   "name": "web3rsvp",
   "scripts": {
-    "deploy": "npx hardhat run scripts/deploy.js --network goerli",
+    "deploy": "npx hardhat run scripts/deploy.js --network mumbai",
     "script": "node scripts/run.js",
     "test": "npx hardhat test --trace"
   },
