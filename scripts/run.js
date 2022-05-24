@@ -10,7 +10,7 @@ const main = async () => {
 
   let deposit = hre.ethers.utils.parseEther("1")
   let maxCapacity = 3
-  let timestamp = 1652517724
+  let timestamp = 1952517724
   let eventDataCID = "bafybeihe2gh5zypdiacmz5zl7z3wuhohlepjwysjkbzar5wgaopr4nwqyi"
  
   let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventDataCID)
@@ -32,11 +32,9 @@ const main = async () => {
   wait = await txn.wait()
   console.log("NEW RSVP:", wait.events[0].event, wait.events[0].args)
 
-  txn = await rsvpContract.confirmAttendee(eventID, deployer.address)
+  txn = await rsvpContract.confirmAllAttendees(eventID)
   wait = await txn.wait()
-
-  txn = await rsvpContract.confirmAttendee(eventID, address2.address)
-  wait = await txn.wait()
+  console.log("CONFIRMED ATTENDEES:", wait.events[0].event, wait.events[0].args)
 
   // wait 10 years
   await hre.network.provider.send("evm_increaseTime", [15778800000000])
