@@ -12,19 +12,20 @@ const main = async () => {
   let maxCapacity = 3
   let timestamp = 1952517724
   let eventDataCID = "bafybeihe2gh5zypdiacmz5zl7z3wuhohlepjwysjkbzar5wgaopr4nwqyi"
+  let ticketPrice = 13
  
-  let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventDataCID)
+  let txn = await rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, ticketPrice, eventDataCID)
   let wait = await txn.wait()
   console.log("NEW EVENT CREATED:", wait.events[0].event, wait.events[0].args)
 
   let eventID = wait.events[0].args.eventID
   console.log("EVENT ID:", eventID)
 
-  txn = await rsvpContract.createNewRSVP(eventID, {value: deposit})
+  txn = await rsvpContract.createNewRSVP(eventID, {value: deposit + ticketPrice})
   wait = await txn.wait()
   console.log("NEW RSVP:", wait.events[0].event, wait.events[0].args)
 
-  txn = await rsvpContract.connect(address1).createNewRSVP(eventID, {value: deposit})
+  txn = await rsvpContract.connect(address1).createNewRSVP(eventID, {value: deposit + ticketPrice})
   wait = await txn.wait()
   console.log("NEW RSVP:", wait.events[0].event, wait.events[0].args)
 
