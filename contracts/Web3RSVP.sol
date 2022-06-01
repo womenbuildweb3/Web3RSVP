@@ -163,7 +163,7 @@ contract Web3RSVP {
             // delete myEvent.claimedRSVPs[attendee];
         }
 
-        emit ConfirmedAttendee(eventId, msg.sender);
+        emit ConfirmedAttendee(eventId, attendee);
     }
 
     function withdrawMoney(bytes32 eventId) external {
