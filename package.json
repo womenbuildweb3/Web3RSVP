@@ -3,7 +3,8 @@
   "scripts": {
     "deploy": "npx hardhat run scripts/deploy.js --network mumbai",
     "script": "node scripts/run.js",
-    "test": "npx hardhat test --trace"
+    "test": "npx hardhat test --trace",
+    "compile": "npx hardhat compile"
   },
   "devDependencies": {
     "@nomiclabs/buidler": "^1.4.8",
