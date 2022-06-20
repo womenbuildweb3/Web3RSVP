@@ -103,7 +103,7 @@ contract Web3RSVP {
         emit NewRSVP(eventId, msg.sender);
     }
 
-    function confirmGroup(bytes32 eventId, address[] calldata attendees) external {
+    function confirmAllAttendees(bytes32 eventId) external {
         // look up event
         CreateEvent memory myEvent = idToEvent[eventId];
 
@@ -111,8 +111,8 @@ contract Web3RSVP {
         require(msg.sender == myEvent.eventOwner, "NOT AUTHORIZED");
 
         //confirm each attendee
-        for (uint8 i = 0; i < attendees.length; i++) {
-            confirmAttendee(eventId, attendees[i]);
+        for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
+            confirmAttendee(eventId, myEvent.confirmedRSVPs[i]);
         }
     }
 

@@ -6,28 +6,35 @@ describe("Create New Event", function () {
     const RSVP = await ethers.getContractFactory("Web3RSVP");
     const rsvpContract = await RSVP.deploy();
     await rsvpContract.deployed();
-    let deposit = ethers.utils.parseEther("1")
 
-    let eventID = '0xf6a3554d595aaa4bde8c3bd8e4be175cbc49ce77fa8f1e3e6bcf77787bdaaced'
+    const [deployer, address1, address2] = await hre.ethers.getSigners();
 
-    await expect(rsvpContract.createNewEvent(1683769877, deposit, 25, "my party"))
+    let deposit = hre.ethers.utils.parseEther("1")
+    let maxCapacity = 3
+    let timestamp = 1718926200
+    let eventDataCID = "bafybeibhwfzx6oo5rymsxmkdxpmkfwyvbjrrwcl7cekmbzlupmp5ypkyfi"
+
+    let address = deployer.adress
+    let eventID = "0x8a054be2ea682cd0bdd68f85c9e0aa6d8ac442d7b2716f0a1baab0954490af68"
+
+
+    await expect(rsvpContract.createNewEvent(timestamp, deposit, maxCapacity, eventDataCID))
     .to.emit(rsvpContract, "NewEventCreated")
-    .withArgs(eventID, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', 1683769877, 25, '1000000000000000000', "my party");
 
     await expect(rsvpContract.createNewRSVP(
-      // this is the eventID created above
       eventID,
       {value: deposit}
      ))
      .to.emit(rsvpContract, "NewRSVP")
-     .withArgs(eventID, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
-
-     await expect(rsvpContract.confirmAttendee(
-      // this is the eventID created above
+     
+    await expect(rsvpContract.connect(address1).createNewRSVP(
       eventID,
-      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+      {value: deposit}
      ))
-     .to.emit(rsvpContract, "ConfirmedAttendee")
-     .withArgs(eventID, '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
+     .to.emit(rsvpContract, "NewRSVP")
+
+     await rsvpContract.confirmAllAttendees(eventID)
+
+     
   });
 });
