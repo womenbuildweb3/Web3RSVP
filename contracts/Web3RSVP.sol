@@ -161,7 +161,7 @@ contract Web3RSVP {
 
     function withdrawUnclaimedDeposits(bytes32 eventId) external {
         // look up event
-        CreateEvent memory myEvent = idToEvent[eventId];
+        CreateEvent storage myEvent = idToEvent[eventId];
 
         // check if already paid
         require(!myEvent.paidOut, "ALREADY PAID");
